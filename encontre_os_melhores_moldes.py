@@ -16,9 +16,9 @@ def main():
 def converte_sequencia_original_sequencia_de_dicionarios(sequencias_analisadas_list, original_dict):
 	
 	""" Exemplo retornado = {"GlmS": {
-		(1, "A") : True, 
+		(1, "A") : [4AMV, 1MOQ_A, 1MOS_A, ...], 
 		(2, "B") : False, 
-		(3, "C") : True, 
+		(3, "C") : [4AMV, 1MOS_A, ...], 
 		...}} """
 	sequencia_de_dicionarios = {}
 	
@@ -32,7 +32,8 @@ def converte_sequencia_original_sequencia_de_dicionarios(sequencias_analisadas_l
 
 	for sequence_analisada_dict in sequencias_analisadas_list:
 		
-		sequence_analisada_str = sequence_analisada_dict[sequence_analisada_dict.keys()[0]]		
+		sequence_analisada_key = sequence_analisada_dict.keys()[0]
+		sequence_analisada_str = sequence_analisada_dict[sequence_analisada_key]
 		ordem = 0
 
 		for par in zip(sequencia_original_str, sequence_analisada_str):
@@ -40,7 +41,17 @@ def converte_sequencia_original_sequencia_de_dicionarios(sequencias_analisadas_l
 			ordem+=1
 
 			if par[0] == par[1]:
-				sequencia_de_dicionarios[nome_dicionario_str][(ordem, par[0])] = True
+				"""
+				Pode existir ou pode nao existir uma lista no dicionario em questao
+				Se nao existir deve se seta a lista com a chave em questao
+				Se existir deve se incrementar a lista com a chave em questao para nao perder chaves anteriores
+				"""
+				if(not sequencia_de_dicionarios[nome_dicionario_str].has_key((ordem, par[0]))):
+					sequencia_de_dicionarios[nome_dicionario_str][(ordem, par[0])] = [sequence_analisada_key]
+
+				else:
+					sequencia_de_dicionarios[nome_dicionario_str][(ordem, par[0])] += [sequence_analisada_key]
+
 			else:
 				"""
 				Antes de setar como False perguntar pra sequencia_de_dicionarios se existe alguem com mesma chave como True
@@ -48,7 +59,7 @@ def converte_sequencia_original_sequencia_de_dicionarios(sequencias_analisadas_l
 				Se eu for verdadeiro devo continuar verdadeiro, se nao que viro falso 
 				"""
 				if(not sequencia_de_dicionarios[nome_dicionario_str].has_key((ordem, par[0]))):
-					sequencia_de_dicionarios[nome_dicionario_str][(ordem, par[0])] = False
+					sequencia_de_dicionarios[nome_dicionario_str][(ordem, par[0])] = []
 
 
 	return sequencia_de_dicionarios
@@ -98,11 +109,11 @@ def sequencias_analisadas():
 	] 
 
 	nova_sequencia = [
-		{"S1":"ABCDeFGHIJKLMNoPqRStuVWXYZ"},
-		{"S2":"ABCDeFGhIjKLMNOPqRStUVWXuZ"},
-		{"S3":"ABCDEFGHIJKLMNoPqrstuvwxyz"},
+		{"S1":"ABCDeFGHIJKLMNoP"},
+		{"S2":"ABcDeFGhIjKLMNOPqRStUVWXuZfsdfdvxvxcvsdfvdzczczc"},
+		{"S3":"ABCDEFGHIJKLMNoPqrstuvwxyzfsdsfsdfsdfsdfsd"},
 		{"S4":"abcdefghijklmNoPqRStuVWXYZ"},
-		{"S5":"trsgacbdvxcvsgfncbsfzxvXYZ"}
+		{"S5":"trsgacbdvxcvsgfPQbsfzxvXYZ"}
 	]
 
 	return nova_sequencia
