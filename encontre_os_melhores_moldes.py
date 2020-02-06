@@ -89,7 +89,7 @@ def sequencia_teorica():
 	
 	teorica = {"GlmS":"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
 	simples = {"GlmS": "abcdefghi"}
-	return simples
+	return teorica
 
 def abrir_proteina(dict_molde):
 	
@@ -130,7 +130,7 @@ def sequencias_analisadas():
 		{"SRE09":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
 		{"SRE10":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
 		{"SRE11":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE12":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
+		{"SRE12":"ABCDEFGHIJKLMNOPQRSTUVWsYZ"},
 		{"SRE13":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
 		{"SRE14":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
 		{"SRE15":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
@@ -156,12 +156,18 @@ def sequencias_analisadas():
 	]
 
 	simples = [
-		{"1AMV_A":"abcsssghi"},
-		{"2MOQ_A":"sssdefghi"},
-		{"3JVX_A":"ssssssghi"}
+		{"1AMV_A":"abcssssss"},
+		{"2MOQ_A":"sbsssssss"},
+		{"3JVX_A":"sscssssss"},
+		{"4KMV_A":"sssdsssss"},
+		{"5LOQ_A":"ssssessss"},
+		{"6MVX_A":"sssssfsss"},
+		{"7NMV_A":"ssssssgss"},
+		{"8OOQ_A":"ssssssshs"},
+		{"9PVX_A":"sssssfghi"}
 	]
 
-	return simples
+	return simula_sequencias
 
 def main():
 
