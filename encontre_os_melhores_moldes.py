@@ -238,7 +238,7 @@ class AnalisadorProteinas:
 		lista_aminoacidos_resultantes = []
 		is_igual_original = True
 
-		for proteina_homologa in self.lista_de_proteinas_homologas:
+		for proteina_homologa in lista_de_proteinas_homologas:
 			for par in zip(proteina_homologa.aminoacidos, proteina_molde.aminoacidos):
 				
 				aminoacido_homologo = par[0]
