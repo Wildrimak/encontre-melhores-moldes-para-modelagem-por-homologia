@@ -248,7 +248,7 @@ class AnalisadorProteinas:
 
 				try:
 					tem_alguem_aqui = lista_aminoacidos_resultantes[position]
-				except ValueError as nao_tem_ninguem_ainda:
+				except IndexError as nao_tem_ninguem_ainda:
 					
 					if aminoacido_homologo.sigla == aminoacido_molde.sigla:
 						lista_aminoacidos_resultantes.append(aminoacido_homologo)
