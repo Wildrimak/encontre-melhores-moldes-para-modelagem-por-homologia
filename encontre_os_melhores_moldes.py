@@ -156,9 +156,9 @@ def sequencias_analisadas():
 	]
 
 	simples = [
-		{"4AMV_A":"abcsss"},
-		{"1MOQ_A":"sssdsf"},
-		{"2JVX_A":"ssssssghi"}
+		{"1AMV_A":"abcsssghi"},
+		{"2MOQ_A":"sssdefghi"},
+		{"3JVX_A":"ssssssghi"}
 	]
 
 	return simples
@@ -176,6 +176,10 @@ def main():
 
 	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
 	retorno = analisador.deixar_somente_proteinas_necessarias()
+
+	for protein in  retorno:
+		print(protein)
+
 	#print(analisador.proteina_resultante)
 	#print("Somos iguais: " + str(analisador.is_equals))
 	#print(analisador.PROTEINA_MOLDE)
@@ -195,7 +199,7 @@ class AnalisadorProteinas:
 
 	def is_equals_molde(self, molde, resultante):
 
-		if len(molde.aminoacidos) != resultante.aminoacidos:
+		if len(molde.aminoacidos) != len(resultante.aminoacidos):
 			return False
 
 		for par in zip(molde.aminoacidos, resultante.aminoacidos):
@@ -221,8 +225,8 @@ class AnalisadorProteinas:
 			dicionario_atualizado[enesima] = None
 			nova_lista_de_proteinas_homologas = self.transformar_em_lista_dicionario_de_proteinas(dicionario_atualizado)
 			proteina_resultante = self.uniao_de_aminoacidos_resultantes(self.PROTEINA_MOLDE, nova_lista_de_proteinas_homologas)
-
-			if self.PROTEINA_MOLDE != proteina_resultante:
+			
+			if not self.is_equals_molde(self.PROTEINA_MOLDE, proteina_resultante):
 				dicionario_atualizado[enesima] = proteina_corrente
 
 		proteinas_retornadas = self.transformar_em_lista_dicionario_de_proteinas(dicionario_atualizado)
@@ -253,7 +257,6 @@ class AnalisadorProteinas:
 
 	def uniao_de_aminoacidos_resultantes(self, proteina_molde, lista_de_proteinas_homologas):
 		lista_aminoacidos_resultantes = []
-		is_igual_original = True
 
 		for proteina_homologa in lista_de_proteinas_homologas:
 			for par in zip(proteina_homologa.aminoacidos, proteina_molde.aminoacidos):
@@ -269,9 +272,12 @@ class AnalisadorProteinas:
 					
 					if aminoacido_homologo.sigla == aminoacido_molde.sigla:
 						lista_aminoacidos_resultantes.append(aminoacido_homologo)
-						is_igual_original = True
 					else:
-						is_igual_original = False
+						lista_aminoacidos_resultantes.append(Aminoacido(aminoacido_homologo.ordem, "!"))
+				else:
+					if aminoacido_homologo.sigla == aminoacido_molde.sigla:
+						lista_aminoacidos_resultantes.pop(position)
+						lista_aminoacidos_resultantes.insert(position, aminoacido_homologo)
 
 		
 		return Proteina("Resultante", lista_aminoacidos_resultantes)
