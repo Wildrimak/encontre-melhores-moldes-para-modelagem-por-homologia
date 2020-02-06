@@ -1,13 +1,8 @@
-def main():
+def antiga():
 
 	original_dict = sequencia_teorica()
-
-
 	analisada_list = sequencias_analisadas()
-	analisada_primeira_dict = analisada_list[0]
-	
 	resposta = converte_sequencia_original_sequencia_de_dicionarios(analisada_list, original_dict)
-	print(resposta)
 	ordem = 0
 	for elemento in zip(resposta["GlmS"].keys(), resposta["GlmS"].values()):
 		ordem+=1
@@ -64,18 +59,75 @@ def converte_sequencia_original_sequencia_de_dicionarios(sequencias_analisadas_l
 
 	return sequencia_de_dicionarios
 
-def _calcula_score(sequencia_teorica, sequence_analisada):
+class Aminoacido:
+
+	def __init__(self, ordem, sigla):
+		self.ordem = ordem
+		self.sigla = sigla
+
+	def __str__(self):
+		return str(self.ordem) + "" + self.sigla
+
+class Proteina:
+	def __init__(self, sigla, aminoacidos):
+		self.sigla = sigla
+		self.aminoacidos = aminoacidos	
+
+	def __str__(self):
+
+		retorno = ""	
+		retorno += "<<\nProteina: " + str(self.sigla) + ",\nAminoacidos: [" 
+
+		for aminoacido in self.aminoacidos:
+			retorno += "<" + str(aminoacido) + ">-"
+
+		retorno = retorno[:-1]
+		retorno += "]\n>>"
+		return retorno
+
+def sequencia_teorica():
 	
-	score_int = 0
+	teorica = {"GlmS":"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
 
-	for par in zip(sequencia_teorica, sequence_analisada):
-		if par[0] == par[1]:
-			score_int+=1
+	return teorica
 
-	return score_int
+def abrir_proteina(dict_molde):
+	
+	chave = dict_molde.keys()[0]
+	sequencia = dict_molde[chave]
 
-def _count(sequence):
-	return len([c for c in sequence])
+	aminoacidos = list()
+	ordem = 0
+
+	for sigla in sequencia:
+		ordem+=1
+		aminoacidos.append(Aminoacido(ordem, sigla))
+
+	return aminoacidos
+
+def main():
+
+	aminoacidos_molde = abrir_proteina(sequencia_teorica())
+
+	proteina_molde = Proteina("Original", aminoacidos_molde)
+	proteinas_homologas = abrir_proteinas_homologas()
+
+	#print(proteina_molde)
+	#for proteina_hmg in proteinas_homologas:
+	#	print(proteina_hmg)
+
+	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
+
+def abrir_proteinas_homologas():
+
+	proteinas = list()
+
+	for sequencia in sequencias_analisadas():
+		aminoacidos = abrir_proteina(sequencia)
+		sigla = sequencia.keys()[0]
+		proteinas.append(Proteina(sigla, aminoacidos))
+
+	return proteinas
 
 def sequencias_analisadas():
 
@@ -116,24 +168,13 @@ def sequencias_analisadas():
 		{"S5":"trsgacbdvxcvsgfPQbsfzxvXYZ"}
 	]
 
-	return simula_sequencias
-
-
-def sequencia_teorica():
-	
-	teorica = {"GlmS":"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
-
-	return teorica
-
-
-
-
+	return nova_sequencia
 
 class AnalisadorProteinas:
 
 	def __init__(self, proteina_molde, proteinas_homologas):
 		
-		self.proteina_resultante = uniao_de_aminoacidos_resultantes(proteina_molde, proteinas_homologas)
+		self.proteina_resultante = self.uniao_de_aminoacidos_resultantes(proteina_molde, proteinas_homologas)
 		self.is_equals = self.is_equals_molde(proteina_molde, self.proteina_resultante)
 		self.PROTEINA_MOLDE = [proteina_molde if self.is_equals else proteina_resultante]
 		self.proteinas_homologas = proteinas_homologas
@@ -217,17 +258,6 @@ class AnalisadorProteinas:
 
 		
 		return Proteina("Resultante", lista_aminoacidos_resultantes)
-
-class Aminoacido:
-	def __init__(self, ordem, sigla):
-		self.ordem = ordem
-		self.sigla = sigla
-
-class Proteina:
-	def __init__(self, sigla, aminoacidos):
-		self.sigla = sigla
-		self.aminoacidos = aminoacidos		
-
 
 
 if __name__ == '__main__':
