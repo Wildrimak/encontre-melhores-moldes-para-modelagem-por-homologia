@@ -77,20 +77,6 @@ def _calcula_score(sequencia_teorica, sequence_analisada):
 def _count(sequence):
 	return len([c for c in sequence])
 
-def calcula_melhores_sequencias(sequencia_original_str, lista_proteinas_homologas):
-	"""
-	
-	for proteina in lista_proteinas_homologas:
-		
-	proteina = [proteina.nome, proteina.score, proteina.lista_aminoacidos]	
-
-		for aminoacido in proteina.get_lista_aminoacidos():
-			aminoacido = [aminoacido.ordem, aminoacido.sigla, aminoacido.sigla_no_original, aminoacido.proteina, aminoacido.lista_proteinas_concorrentes]
-
-	"""
-	pass
-
-
 def sequencias_analisadas():
 
 	simula_sequencias = [
@@ -140,39 +126,110 @@ def sequencia_teorica():
 	return teorica
 
 
+
+
+
+class AnalisadorProteinas:
+
+	def __init__(self, proteina_molde, proteinas_homologas):
+		
+		self.proteina_resultante = uniao_de_aminoacidos_resultantes(proteina_molde, proteinas_homologas)
+		self.is_equals = self.is_equals_molde(proteina_molde, self.proteina_resultante)
+		self.PROTEINA_MOLDE = [proteina_molde if self.is_equals else proteina_resultante]
+		self.proteinas_homologas = proteinas_homologas
+		self.copia_proteinas_homologas = tuple(proteinas_homologas)
+
+
+	def is_equals_molde(self, molde, resultante):
+
+		for par in zip(molde.aminoacidos, resultante.aminoacidos):
+			aminoacido_molde  = par[0]
+			aminoacido_resultante = par[1]
+
+			if not (aminoacido_molde.ordem == aminoacido_resultante.ordem and aminoacido_molde.sigla == aminoacido_resultante.sigla):
+				return False
+
+		return True	
+
+
+	def deixar_somente_proteinas_necessarias(self):
+
+		proteina_corrente = None
+		quantidade_de_analises = len(self.copia_proteinas_homologas)
+		dicionario_atualizado = dicionarizar_lista_de_proteinas(self, self.copia_proteinas_homologas)
+
+		for enesima in xrange(quantidade_de_analises):
+			proteina_corrente = dicionario_atualizado[enesima]
+			dicionario_atualizado[enesima] = None
+			nova_lista_de_proteinas_homologas = transformar_em_lista_dicionario_de_proteinas(dicionario_atualizado)
+			proteina_resultante = self.uniao_de_aminoacidos_resultantes(self.PROTEINA_MOLDE, nova_lista_de_proteinas_homologas)
+
+			if self.PROTEINA_MOLDE != proteina_resultante:
+				dicionario_atualizado[enesima] = proteina_corrente
+
+		proteinas_retornadas = transformar_em_lista_dicionario_de_proteinas(dicionario_atualizado)
+
+		return proteinas_retornadas
+			
+	def dicionarizar_lista_de_proteinas(self, proteinas):
+		
+		dicionario = dict()
+		for i in xrange(len(proteinas)):
+			dicionario[i] = proteinas[i]
+
+		return dicionario
+
+	def transformar_em_lista_dicionario_de_proteinas(self, dicionario_de_proteinas):
+
+		lista = list()
+		chaves = dicionario_de_proteinas.keys()
+		chaves = chaves.sort()
+
+		for key in chaves:
+			value = dicionario_de_proteinas[key]
+
+			if (value != None):
+				lista.insert(key-1, value)
+
+		return lista
+
+	def uniao_de_aminoacidos_resultantes(self, proteina_molde, lista_de_proteinas_homologas):
+		lista_aminoacidos_resultantes = []
+		is_igual_original = True
+
+		for proteina_homologa in self.lista_de_proteinas_homologas:
+			for par in zip(proteina_homologa.aminoacidos, proteina_molde.aminoacidos):
+				
+				aminoacido_homologo = par[0]
+				aminoacido_molde = par[1]
+
+				position = aminoacido_molde.ordem - 1
+
+				try:
+					tem_alguem_aqui = lista_aminoacidos_resultantes[position]
+				except ValueError as nao_tem_ninguem_ainda:
+					
+					if aminoacido_homologo.sigla == aminoacido_molde.sigla:
+						lista_aminoacidos_resultantes.append(aminoacido_homologo)
+						is_igual_original = True
+					else:
+						is_igual_original = False
+
+		
+		return Proteina("Resultante", lista_aminoacidos_resultantes)
+
+class Aminoacido:
+	def __init__(self, ordem, sigla):
+		self.ordem = ordem
+		self.sigla = sigla
+
+class Proteina:
+	def __init__(self, sigla, aminoacidos):
+		self.sigla = sigla
+		self.aminoacidos = aminoacidos		
+
+
+
 if __name__ == '__main__':
 	main()
 
-"""
-
-Simplificando algoritmo:
-
-
-Objetivo: Entregar menor quantidade de proteinas possiveis capaz de formar uma modelagem por homologia
-
-Passo 1: Ter a sequencia de aminoacidos original
-Passo 2: Ter a lista de sequencias homologas que podem formar uma modelagem por homologia
-Passo 3: Marcar a ordem de cada aminoacido na sequencia original por transforma-lo em uma lista de objetos aminoacidos 
-na seguinte forma: aminoacido.ordem, aminoacido.sigla
-Passo 4: Marcar a ordem de cada aminoacido em cada sequencia da lista
-Passo 5: Fazer a união resultante de todos os aminoacidos recebendo a sequencia original e a lista de sequencias
-	Sub-passo 5.1: Criar lista de aminoacidos resultantes vazia
-	Sub-passo 5.2: Criar is_igual_original = true
-	Sub-passo 5.3: Iterar sobre a lista de sequencias
-	Sub-passo 5.4: Iterar sobre a lista de aminoacidos (aminoacido.ordem, aminoacido.sigla) juntamente com lista de aminoacidos orginal
-	Sub-passo 5.5: Verificar se a lista de aminoacidos resultantes tem algum elemento na posição aminoacido.ordem - 1
-	Sub-passo 5.6: Se tiver faça acontecer nada
-	Sub-passo 5.7: Se não tiver verificar se o par de aminoacidos é igual:
-	Sub-passo 5.8: Se for igual adicionar aminoacido na lista de aminoacidos resultantes e fazer is_igual_original = true
-	Sub-passo 5.9: Se o par de aminoacidos não forem iguais (perguntar se nao tem ninguem naquela casa e se nao tiver) 
-	fazer o is_igual_original = false 	
-	Sub-passo 5.10 retornar tupla(lista de aminoacidos resultantes, is_igual_original)
-Passo 6: Devolver a tupla (sequencia_resultante, is_igual_original)
-Passo 7: Se is_igual_original for true fazer iniciar_interacao+=1 
-Passo X: Remover a primeira sequencia da minha lista de sequencias
-Passo X: Me chamar novamente passando (sequencia_original, lista_de_sequencias, iniciar_interacao) e esperar retorno
-Passo X: Se no retorno is_igual_original for falso adicionar a sequencia removida novamente e continuar algoritmo
-Passo X: Quando iniciar_interacao for maior que tamanho sequencia original parar a recursividade devolvendo a lista 
--- Passo 8: Se is_igual_original for falso encerrar algoritmo entregando a lista de sequencias vinda com ele
-
-"""
