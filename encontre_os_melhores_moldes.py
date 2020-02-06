@@ -225,7 +225,7 @@ class AnalisadorProteinas:
 			if self.PROTEINA_MOLDE != proteina_resultante:
 				dicionario_atualizado[enesima] = proteina_corrente
 
-		proteinas_retornadas = transformar_em_lista_dicionario_de_proteinas(dicionario_atualizado)
+		proteinas_retornadas = self.transformar_em_lista_dicionario_de_proteinas(dicionario_atualizado)
 
 		return proteinas_retornadas
 			
