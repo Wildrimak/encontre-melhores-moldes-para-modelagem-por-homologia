@@ -76,7 +76,7 @@ class Proteina:
 	def __str__(self):
 
 		retorno = ""	
-		retorno += "<<\nProteina: " + str(self.sigla) + ",\nAminoacidos: [" 
+		retorno += "<<\n\tProteina: " + str(self.sigla) + ",\n\tAminoacidos: [" 
 
 		for aminoacido in self.aminoacidos:
 			retorno += "<" + str(aminoacido) + ">-"
@@ -88,8 +88,8 @@ class Proteina:
 def sequencia_teorica():
 	
 	teorica = {"GlmS":"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
-
-	return teorica
+	simples = {"GlmS": "abcdefghi"}
+	return simples
 
 def abrir_proteina(dict_molde):
 	
@@ -104,19 +104,6 @@ def abrir_proteina(dict_molde):
 		aminoacidos.append(Aminoacido(ordem, sigla))
 
 	return aminoacidos
-
-def main():
-
-	aminoacidos_molde = abrir_proteina(sequencia_teorica())
-
-	proteina_molde = Proteina("Original", aminoacidos_molde)
-	proteinas_homologas = abrir_proteinas_homologas()
-
-	#print(proteina_molde)
-	#for proteina_hmg in proteinas_homologas:
-	#	print(proteina_hmg)
-
-	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
 
 def abrir_proteinas_homologas():
 
@@ -168,7 +155,32 @@ def sequencias_analisadas():
 		{"S5":"trsgacbdvxcvsgfPQbsfzxvXYZ"}
 	]
 
-	return nova_sequencia
+	simples = [
+		{"4AMV_A":"abcsss"},
+		{"1MOQ_A":"sssdsf"},
+		{"2JVX_A":"ssssssghi"}
+	]
+
+	return simples
+
+def main():
+
+	aminoacidos_molde = abrir_proteina(sequencia_teorica())
+
+	proteina_molde = Proteina("Original", aminoacidos_molde)
+	proteinas_homologas = abrir_proteinas_homologas()
+
+	#print(proteina_molde)
+	#for proteina_hmg in proteinas_homologas:
+		#print(proteina_hmg)
+
+	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
+
+	#print(analisador.proteina_resultante)
+	#print("Somos iguais: " + str(analisador.is_equals))
+	#print(analisador.PROTEINA_MOLDE)
+	#print(str(analisador.proteinas_homologas))
+	#print(str(analisador.copia_proteinas_homologas))
 
 class AnalisadorProteinas:
 
@@ -176,18 +188,23 @@ class AnalisadorProteinas:
 		
 		self.proteina_resultante = self.uniao_de_aminoacidos_resultantes(proteina_molde, proteinas_homologas)
 		self.is_equals = self.is_equals_molde(proteina_molde, self.proteina_resultante)
-		self.PROTEINA_MOLDE = [proteina_molde if self.is_equals else self.proteina_resultante]
+		self.PROTEINA_MOLDE = proteina_molde if self.is_equals else self.proteina_resultante
 		self.proteinas_homologas = proteinas_homologas
 		self.copia_proteinas_homologas = tuple(proteinas_homologas)
 
 
 	def is_equals_molde(self, molde, resultante):
 
+		if len(molde.aminoacidos) != resultante.aminoacidos:
+			return False
+
 		for par in zip(molde.aminoacidos, resultante.aminoacidos):
 			aminoacido_molde  = par[0]
 			aminoacido_resultante = par[1]
 
-			if not (aminoacido_molde.ordem == aminoacido_resultante.ordem and aminoacido_molde.sigla == aminoacido_resultante.sigla):
+			if aminoacido_molde.ordem != aminoacido_resultante.ordem: 
+				return False
+			if aminoacido_molde.sigla != aminoacido_resultante.sigla:
 				return False
 
 		return True	
