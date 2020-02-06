@@ -243,7 +243,7 @@ class AnalisadorProteinas:
 		chaves = dicionario_de_proteinas.keys()
 		chaves = chaves.sort()
 
-		for key in chaves:
+		for key in dicionario_de_proteinas:
 			value = dicionario_de_proteinas[key]
 
 			if (value != None):
