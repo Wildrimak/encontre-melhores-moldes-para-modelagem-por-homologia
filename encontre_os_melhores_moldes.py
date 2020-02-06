@@ -175,7 +175,7 @@ def main():
 		#print(proteina_hmg)
 
 	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
-
+	retorno = analisador.deixar_somente_proteinas_necessarias()
 	#print(analisador.proteina_resultante)
 	#print("Somos iguais: " + str(analisador.is_equals))
 	#print(analisador.PROTEINA_MOLDE)
@@ -214,12 +214,12 @@ class AnalisadorProteinas:
 
 		proteina_corrente = None
 		quantidade_de_analises = len(self.copia_proteinas_homologas)
-		dicionario_atualizado = dicionarizar_lista_de_proteinas(self, self.copia_proteinas_homologas)
+		dicionario_atualizado = self.dicionarizar_lista_de_proteinas(self.copia_proteinas_homologas)
 
 		for enesima in xrange(quantidade_de_analises):
 			proteina_corrente = dicionario_atualizado[enesima]
 			dicionario_atualizado[enesima] = None
-			nova_lista_de_proteinas_homologas = transformar_em_lista_dicionario_de_proteinas(dicionario_atualizado)
+			nova_lista_de_proteinas_homologas = self.transformar_em_lista_dicionario_de_proteinas(dicionario_atualizado)
 			proteina_resultante = self.uniao_de_aminoacidos_resultantes(self.PROTEINA_MOLDE, nova_lista_de_proteinas_homologas)
 
 			if self.PROTEINA_MOLDE != proteina_resultante:
