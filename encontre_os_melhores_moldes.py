@@ -1,120 +1,8 @@
-def antiga():
-
-	original_dict = sequencia_teorica()
-	analisada_list = sequencias_analisadas()
-	resposta = converte_sequencia_original_sequencia_de_dicionarios(analisada_list, original_dict)
-	ordem = 0
-	for elemento in zip(resposta["GlmS"].keys(), resposta["GlmS"].values()):
-		ordem+=1
-		print(ordem, elemento)
-
-def converte_sequencia_original_sequencia_de_dicionarios(sequencias_analisadas_list, original_dict):
-	
-	""" Exemplo retornado = {"GlmS": {
-		(1, "A") : [4AMV, 1MOQ_A, 1MOS_A, ...], 
-		(2, "B") : False, 
-		(3, "C") : [4AMV, 1MOS_A, ...], 
-		...}} """
-	sequencia_de_dicionarios = {}
-	
-	""" Faz algo como {"GlmS" : {}} """
-	nome_dicionario_str = original_dict.keys()[0]
-	sequencia_de_dicionarios[nome_dicionario_str] = {}
-
-	""" Algo como "ABCDE..." """
-	sequencia_original_str = original_dict[original_dict.keys()[0]] 
-
-
-	for sequence_analisada_dict in sequencias_analisadas_list:
-		
-		sequence_analisada_key = sequence_analisada_dict.keys()[0]
-		sequence_analisada_str = sequence_analisada_dict[sequence_analisada_key]
-		ordem = 0
-
-		for par in zip(sequencia_original_str, sequence_analisada_str):
-
-			ordem+=1
-
-			if par[0] == par[1]:
-				"""
-				Pode existir ou pode nao existir uma lista no dicionario em questao
-				Se nao existir deve se seta a lista com a chave em questao
-				Se existir deve se incrementar a lista com a chave em questao para nao perder chaves anteriores
-				"""
-				if(not sequencia_de_dicionarios[nome_dicionario_str].has_key((ordem, par[0]))):
-					sequencia_de_dicionarios[nome_dicionario_str][(ordem, par[0])] = [sequence_analisada_key]
-
-				else:
-					sequencia_de_dicionarios[nome_dicionario_str][(ordem, par[0])] += [sequence_analisada_key]
-
-			else:
-				"""
-				Antes de setar como False perguntar pra sequencia_de_dicionarios se existe alguem com mesma chave como True
-				Se nao existir eh que coloca essa chave como False
-				Se eu for verdadeiro devo continuar verdadeiro, se nao que viro falso 
-				"""
-				if(not sequencia_de_dicionarios[nome_dicionario_str].has_key((ordem, par[0]))):
-					sequencia_de_dicionarios[nome_dicionario_str][(ordem, par[0])] = []
-
-
-	return sequencia_de_dicionarios
-
-class Aminoacido:
-
-	def __init__(self, ordem, sigla):
-		self.ordem = ordem
-		self.sigla = sigla
-
-	def __str__(self):
-		return str(self.ordem) + "" + self.sigla
-
-class Proteina:
-	def __init__(self, sigla, aminoacidos):
-		self.sigla = sigla
-		self.aminoacidos = aminoacidos	
-
-	def __str__(self):
-
-		retorno = ""	
-		retorno += "<<\n\tProteina: " + str(self.sigla) + ",\n\tAminoacidos: [" 
-
-		for aminoacido in self.aminoacidos:
-			retorno += "<" + str(aminoacido) + ">-"
-
-		retorno = retorno[:-1]
-		retorno += "]\n>>"
-		return retorno
-
 def sequencia_teorica():
 	
 	teorica = {"GlmS":"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
 	simples = {"GlmS": "abcdefghi"}
-	return teorica
-
-def abrir_proteina(dict_molde):
-	
-	chave = dict_molde.keys()[0]
-	sequencia = dict_molde[chave]
-
-	aminoacidos = list()
-	ordem = 0
-
-	for sigla in sequencia:
-		ordem+=1
-		aminoacidos.append(Aminoacido(ordem, sigla))
-
-	return aminoacidos
-
-def abrir_proteinas_homologas():
-
-	proteinas = list()
-
-	for sequencia in sequencias_analisadas():
-		aminoacidos = abrir_proteina(sequencia)
-		sigla = sequencia.keys()[0]
-		proteinas.append(Proteina(sigla, aminoacidos))
-
-	return proteinas
+	return simples
 
 def sequencias_analisadas():
 
@@ -156,9 +44,9 @@ def sequencias_analisadas():
 	]
 
 	simples = [
-		{"1AMV_A":"abcssssss"},
+		{"1AMV_A":"absssssss"},
 		{"2MOQ_A":"sbsssssss"},
-		{"3JVX_A":"sscssssss"},
+		{"3JVX_A":"ssssssssi"},
 		{"4KMV_A":"sssdsssss"},
 		{"5LOQ_A":"ssssessss"},
 		{"6MVX_A":"sssssfsss"},
@@ -167,30 +55,58 @@ def sequencias_analisadas():
 		{"9PVX_A":"sssssfghi"}
 	]
 
-	return simula_sequencias
+	return simples
 
-def main():
+def abrir_proteina(dict_molde):
+	
+	chave = dict_molde.keys()[0]
+	sequencia = dict_molde[chave]
 
-	aminoacidos_molde = abrir_proteina(sequencia_teorica())
+	aminoacidos = list()
+	ordem = 0
 
-	proteina_molde = Proteina("Original", aminoacidos_molde)
-	proteinas_homologas = abrir_proteinas_homologas()
+	for sigla in sequencia:
+		ordem+=1
+		aminoacidos.append(Aminoacido(ordem, sigla))
 
-	#print(proteina_molde)
-	#for proteina_hmg in proteinas_homologas:
-		#print(proteina_hmg)
+	return aminoacidos
 
-	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
-	retorno = analisador.deixar_somente_proteinas_necessarias()
+def abrir_proteinas_homologas():
 
-	for protein in  retorno:
-		print(protein)
+	proteinas = list()
 
-	#print(analisador.proteina_resultante)
-	#print("Somos iguais: " + str(analisador.is_equals))
-	#print(analisador.PROTEINA_MOLDE)
-	#print(str(analisador.proteinas_homologas))
-	#print(str(analisador.copia_proteinas_homologas))
+	for sequencia in sequencias_analisadas():
+		aminoacidos = abrir_proteina(sequencia)
+		sigla = sequencia.keys()[0]
+		proteinas.append(Proteina(sigla, aminoacidos))
+
+	return proteinas
+
+class Aminoacido:
+
+	def __init__(self, ordem, sigla):
+		self.ordem = ordem
+		self.sigla = sigla
+
+	def __str__(self):
+		return str(self.ordem) + "" + self.sigla
+
+class Proteina:
+	def __init__(self, sigla, aminoacidos):
+		self.sigla = sigla
+		self.aminoacidos = aminoacidos	
+
+	def __str__(self):
+
+		retorno = ""	
+		retorno += "<<\n\tProteina: " + str(self.sigla) + ",\n\tAminoacidos: [" 
+
+		for aminoacido in self.aminoacidos:
+			retorno += "<" + str(aminoacido) + ">-"
+
+		retorno = retorno[:-1]
+		retorno += "]\n>>"
+		return retorno
 
 class AnalisadorProteinas:
 
@@ -288,6 +204,18 @@ class AnalisadorProteinas:
 		
 		return Proteina("Resultante", lista_aminoacidos_resultantes)
 
+def main():
+
+	aminoacidos_molde = abrir_proteina(sequencia_teorica())
+
+	proteina_molde = Proteina("Original", aminoacidos_molde)
+	proteinas_homologas = abrir_proteinas_homologas()
+
+	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
+	retorno = analisador.deixar_somente_proteinas_necessarias()
+
+	for protein in  retorno:
+		print(protein)
 
 if __name__ == '__main__':
 	main()
