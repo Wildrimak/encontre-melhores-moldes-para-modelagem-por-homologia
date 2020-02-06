@@ -176,7 +176,7 @@ class AnalisadorProteinas:
 		
 		self.proteina_resultante = self.uniao_de_aminoacidos_resultantes(proteina_molde, proteinas_homologas)
 		self.is_equals = self.is_equals_molde(proteina_molde, self.proteina_resultante)
-		self.PROTEINA_MOLDE = [proteina_molde if self.is_equals else proteina_resultante]
+		self.PROTEINA_MOLDE = [proteina_molde if self.is_equals else self.proteina_resultante]
 		self.proteinas_homologas = proteinas_homologas
 		self.copia_proteinas_homologas = tuple(proteinas_homologas)
 
