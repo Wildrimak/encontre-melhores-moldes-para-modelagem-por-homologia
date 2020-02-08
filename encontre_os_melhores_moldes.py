@@ -2,7 +2,7 @@
 def sequencia_teorica(which=0):
 	
 	teorica = {"GlmS":"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
-	simples = {"GlmS": "abcdefghi"}
+	simples = {"GlmS": "abcdefghij"}
 
 	file = "/home/wildrimak/projects/Aperfeiçoar-e-colocar-no-github/EncontreMelhoresMoldesParaModelagemPorHomologia/sequencias/glms"
 	arquivo = open(file, 'r')
@@ -27,24 +27,20 @@ def sequencias_analisadas(which=0):
 	simula_sequencias = [
 		{"SRE01":"ABDCEREFGGHIJJKKLMXQRZSTMUVWXYZ\n"},
 		{"SRE10":"MCGIVGYVGRRPAYVVVMDALRRMEYRGYDSSGIALVDGGTLTVRRRAGRLANLEEAVAEMPSTALSGTTGLGHTRWA\n"},
-		{"SRE11":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"}
+		{"SRE11":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ\n"}
 	] 
 
-	nova_sequencia = [
-		{"S1":"ABCDeFGHIJKLMNoP"},
-		{"S2":"ABcDeFGhIjKLMNOPqRStUVWXuZfsdfdvxvxcvsdfvdzczczc"}
-	]
-
 	simples = [
-		{"8OOQ_A":"ssssssshs"},
-		{"9PVX_A":"sssssfghi"}
+		{"7ABQ_A":"abzsssshsj"},
+		{"8SOQ_A":"sssdefshsj"},
+		{"9PVX_A":"sssssfghij"}
 	]
 
 	obtidas = obter_proteinas_homologas_from_file()
 
-	lista = [obtidas, simula_sequencias, nova_sequencia, simples]
+	lista = [obtidas, simula_sequencias, simples]
 
-	return lista[0]
+	return lista[which]
 
 def abrir_proteina(dict_molde):
 	
@@ -113,7 +109,124 @@ class Aminoacido:
 class Proteina:
 	def __init__(self, sigla, aminoacidos):
 		self.sigla = sigla
-		self.aminoacidos = aminoacidos	
+		self.aminoacidos = aminoacidos
+		self.tamanho = len(aminoacidos)
+		self.score = self.calcula_score()	
+		self.percentual = self.calcula_percentual()
+
+	def calcula_score(self):
+		
+		score = 0
+		
+		for aminoacido in self.aminoacidos:
+			if aminoacido.sigla != "!":
+				score+=1
+
+		return score
+
+	def compare(self, proteina):
+
+
+		meus_aminoacidos = list(self.aminoacidos)
+		aminoacidos_da_outra = list(proteina.aminoacidos)
+		minha_qtd_aminoacidos = len(meus_aminoacidos)
+		qtd_aminoacidos_outra = len(aminoacidos_da_outra)
+
+		if minha_qtd_aminoacidos != qtd_aminoacidos_outra:
+			
+			if (minha_qtd_aminoacidos < qtd_aminoacidos_outra):
+				
+				preenche_com = qtd_aminoacidos_outra - minha_qtd_aminoacidos
+				for i in xrange(preenche_com):
+					meus_aminoacidos.append(None)
+
+			else:
+
+				preenche_com = minha_qtd_aminoacidos - qtd_aminoacidos_outra
+				for i in xrange(preenche_com):
+					aminoacidos_da_outra.append(None)
+
+
+		qtd_aminoacidos_iguais = 0
+
+
+		monta_string = {"cima" : {self.sigla : []}, "baixo" : {proteina.sigla : []}, "centro" : {">" : []}}
+
+		for par in zip(meus_aminoacidos, aminoacidos_da_outra):
+			
+			my_amino, other_amino = par[0], par[1]
+
+
+			if my_amino != None and other_amino != None:
+
+				monta_string["cima"][self.sigla].append(my_amino)
+				monta_string["baixo"][proteina.sigla].append(other_amino)
+
+				if my_amino.sigla == other_amino.sigla:
+		
+					qtd_aminoacidos_iguais += 1
+					monta_string["centro"][">"].append("=")
+			
+				else:
+					monta_string["centro"][">"].append("x")
+		
+			else:
+				monta_string["cima"][self.sigla].append("!")
+				monta_string["baixo"][proteina.sigla].append("!")
+				monta_string["centro"][">"].append("?")
+				
+		
+		representation = self.__monta_string(monta_string, proteina)
+		
+		percentual_de_similaridade = 0
+
+		if proteina.tamanho != 0: 
+			percentual_de_similaridade = (qtd_aminoacidos_iguais * 100.0)/proteina.tamanho
+
+		return {
+				"representation" : representation, 
+				"qtd_aminoacidos_iguais" : qtd_aminoacidos_iguais, 
+				"percentual_de_similaridade" : percentual_de_similaridade
+			}
+
+	def __monta_string(self, dicionario, proteina):
+		
+		string = ""
+
+		lista_de_cima = dicionario["cima"][self.sigla]
+		lista_de_baixo = dicionario["baixo"][proteina.sigla]
+		lista_de_centro = dicionario["centro"][">"]
+		multiplo = len(lista_de_cima)
+
+		__tamanho_sigla = len([i for i in self.sigla]) 
+		__tamanho_outra_sigla = len([i for i in proteina.sigla])
+
+		espacador = __tamanho_sigla if __tamanho_sigla > __tamanho_outra_sigla else __tamanho_outra_sigla
+
+
+		string += self.sigla.ljust(espacador)+ " "
+
+		for i in xrange(multiplo):
+			string += str(lista_de_cima[i])
+
+		string+="\n" + ">"*espacador + " "
+
+		for i in xrange(multiplo):
+			string+=lista_de_centro[i]
+
+		string+="\n" + proteina.sigla.ljust(espacador) + " "
+
+		for i in xrange(multiplo):
+			string += str(lista_de_baixo[i])
+
+		return string
+
+
+
+	def calcula_percentual(self):
+		#TENTAR ENTENDER QUANDO EU TO CRIANDO UMA PROTEINA DE TAMANHO 0
+		percentual = 0 if self.tamanho == 0 else (self.score * 100.0)/self.tamanho
+		return percentual
 
 	def __str__(self):
 
@@ -130,7 +243,8 @@ class Proteina:
 class AnalisadorProteinas:
 
 	def __init__(self, proteina_molde, proteinas_homologas):
-		
+
+		self.proteina_de_entrada = proteina_molde
 		self.proteina_resultante = self.uniao_de_aminoacidos_resultantes(proteina_molde, proteinas_homologas)
 		self.is_equals = self.is_equals_molde(proteina_molde, self.proteina_resultante)
 		self.PROTEINA_MOLDE = proteina_molde if self.is_equals else self.proteina_resultante
@@ -223,21 +337,47 @@ class AnalisadorProteinas:
 		
 		return Proteina("Resultante", lista_aminoacidos_resultantes)
 
+	def summary(self):
+		proteinas = self.deixar_somente_proteinas_necessarias()
+		print("Qtd de proteinas que entraram: " + str(len(self.copia_proteinas_homologas)))
+		print("Qtd de proteinas necessarias: " + str(len(proteinas)))
+		print("As sequencias ficam igual a original? " + str(self.is_equals))
+		print("Qtd de aminoacidos da proteina de entrada: " + str(self.proteina_de_entrada.tamanho))
+		print("Score obtido: " + str(self.PROTEINA_MOLDE.score))
+		print("Percentual em relação ao melhor que se pode obter: " + str(self.PROTEINA_MOLDE.percentual))
+
+
+		nomes = list()
+		for proteina in proteinas:
+			nomes.append(proteina.sigla)
+
+		nomes.sort()
+		print("Uteis: " + str(nomes))
+
+		return proteinas
+
+	def details(self, proteinas):
+
+		for proteina in proteinas:
+			result = proteina.compare(self.PROTEINA_MOLDE)
+
+			print(result["representation"])
+			print(result["percentual_de_similaridade"])
+			print(result["qtd_aminoacidos_iguais"])
+
+
 def main():
 
-	aminoacidos_molde = abrir_proteina(sequencia_teorica())
-	proteina_molde = Proteina("Original", aminoacidos_molde)
+	which = int(input("0 - Real, 1 - Complex, 2 - Sample: "))
+
+	aminoacidos_molde = abrir_proteina(sequencia_teorica(which))
+	proteinas_homologas = abrir_proteinas_homologas(sequencias_analisadas(which))
 	
-	#proteinas_homologas = abrir_proteinas_homologas(sequencias_analisadas())
-	proteinas_homologas = abrir_proteinas_homologas(obter_proteinas_homologas_from_file())
-
+	proteina_molde = Proteina("Original", aminoacidos_molde)
 	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
-	retorno = analisador.deixar_somente_proteinas_necessarias()
-
-	for protein in  retorno:
-		print(protein)
-
-	print(len(retorno))
+	
+	proteinas = analisador.summary()
+	analisador.details(proteinas)
 
 if __name__ == '__main__':
 	main()
