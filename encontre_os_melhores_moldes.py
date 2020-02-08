@@ -150,7 +150,10 @@ class Proteina:
 		qtd_aminoacidos_iguais = 0
 
 
-		monta_string = {"cima" : {self.sigla : []}, "baixo" : {proteina.sigla : []}, "centro" : {">" : []}}
+		monta_string = {
+				"cima" : {self.sigla : []}, 
+				"baixo" : {proteina.sigla : []}
+			}
 
 		for par in zip(meus_aminoacidos, aminoacidos_da_outra):
 			
@@ -165,15 +168,10 @@ class Proteina:
 				if my_amino.sigla == other_amino.sigla:
 		
 					qtd_aminoacidos_iguais += 1
-					monta_string["centro"][">"].append("=")
-			
-				else:
-					monta_string["centro"][">"].append("x")
 		
 			else:
 				monta_string["cima"][self.sigla].append("!")
 				monta_string["baixo"][proteina.sigla].append("!")
-				monta_string["centro"][">"].append("?")
 				
 		
 		representation = self.__monta_string(monta_string, proteina)
@@ -195,7 +193,21 @@ class Proteina:
 
 		lista_de_cima = dicionario["cima"][self.sigla]
 		lista_de_baixo = dicionario["baixo"][proteina.sigla]
-		lista_de_centro = dicionario["centro"][">"]
+		lista_de_centro = list()
+
+		count = 0
+		for par in zip(lista_de_cima, lista_de_baixo):
+			count+=1
+
+			my_amino, other_amino = par[0], par[1]
+
+
+
+			if my_amino == other_amino:
+				lista_de_centro.append(str(count) + "=")
+			else:
+				lista_de_centro.append(str(count) + "!")
+
 		multiplo = len(lista_de_cima)
 
 		__tamanho_sigla = len([i for i in self.sigla]) 
