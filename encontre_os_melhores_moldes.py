@@ -1,61 +1,50 @@
-def sequencia_teorica():
+# -*- coding: utf-8 -*-
+def sequencia_teorica(which=0):
 	
 	teorica = {"GlmS":"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
 	simples = {"GlmS": "abcdefghi"}
-	return simples
 
-def sequencias_analisadas():
+	file = "/home/wildrimak/projects/Aperfeiçoar-e-colocar-no-github/EncontreMelhoresMoldesParaModelagemPorHomologia/sequencias/glms"
+	arquivo = open(file, 'r')
+	conteudo = arquivo.readlines()
+	arquivo.close()
+
+	one_row = ""
+
+	for line in conteudo:
+		one_row+=line[:-1]
+
+	one_row = one_row[:-1]
+	
+	real = {"GlmS": one_row}
+
+	lista = [real, teorica, simples]
+
+	return lista[which]
+
+def sequencias_analisadas(which=0):
 
 	simula_sequencias = [
-		{"SRE01":"ABDCEREFGGHIJJKKLMXQRZSTMUVWXYZ"},
-		{"SRE02":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE03":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
-		{"SRE04":"ABDCEREFGGHIJJKKLMXQRZSTMUVWXYZ"},
-		{"SRE05":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE03":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
-		{"SRE07":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE08":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
-		{"SRE09":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE10":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
-		{"SRE11":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE12":"ABCDEFGHIJKLMNOPQRSTUVWsYZ"},
-		{"SRE13":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE14":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
-		{"SRE15":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE16":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
-		{"SRE17":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE18":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
-		{"SRE19":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE20":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
-		{"SRE21":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE22":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"},
-		{"SRE23":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE24":"ABBCDEAKFGHIOPQRLSSUVZFXYZSY"},
-		{"SRE25":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"},
-		{"SRE26":"ABBCDEAKFGHIOPQRLSTUVZFXYZSY"}
+		{"SRE01":"ABDCEREFGGHIJJKKLMXQRZSTMUVWXYZ\n"},
+		{"SRE10":"MCGIVGYVGRRPAYVVVMDALRRMEYRGYDSSGIALVDGGTLTVRRRAGRLANLEEAVAEMPSTALSGTTGLGHTRWA\n"},
+		{"SRE11":"ABCDEFFBJGHLIJWKLVMNOZPQTRSNTUVWXYZ"}
 	] 
 
 	nova_sequencia = [
 		{"S1":"ABCDeFGHIJKLMNoP"},
-		{"S2":"ABcDeFGhIjKLMNOPqRStUVWXuZfsdfdvxvxcvsdfvdzczczc"},
-		{"S3":"ABCDEFGHIJKLMNoPqrstuvwxyzfsdsfsdfsdfsdfsd"},
-		{"S4":"abcdefghijklmNoPqRStuVWXYZ"},
-		{"S5":"trsgacbdvxcvsgfPQbsfzxvXYZ"}
+		{"S2":"ABcDeFGhIjKLMNOPqRStUVWXuZfsdfdvxvxcvsdfvdzczczc"}
 	]
 
 	simples = [
-		{"1AMV_A":"absssssss"},
-		{"2MOQ_A":"sbsssssss"},
-		{"3JVX_A":"ssssssssi"},
-		{"4KMV_A":"sssdsssss"},
-		{"5LOQ_A":"ssssessss"},
-		{"6MVX_A":"sssssfsss"},
-		{"7NMV_A":"ssssssgss"},
 		{"8OOQ_A":"ssssssshs"},
 		{"9PVX_A":"sssssfghi"}
 	]
 
-	return simples
+	obtidas = obter_proteinas_homologas_from_file()
+
+	lista = [obtidas, simula_sequencias, nova_sequencia, simples]
+
+	return lista[0]
 
 def abrir_proteina(dict_molde):
 	
@@ -71,17 +60,47 @@ def abrir_proteina(dict_molde):
 
 	return aminoacidos
 
-def abrir_proteinas_homologas():
+def abrir_proteinas_homologas(sequencias):
 
 	proteinas = list()
 
-	for sequencia in sequencias_analisadas():
+	for sequencia in sequencias:
 		aminoacidos = abrir_proteina(sequencia)
 		sigla = sequencia.keys()[0]
 		proteinas.append(Proteina(sigla, aminoacidos))
 
 	return proteinas
 
+def obter_proteinas_homologas_from_file():
+	file = "/home/wildrimak/projects/Aperfeiçoar-e-colocar-no-github/EncontreMelhoresMoldesParaModelagemPorHomologia/sequencias/blast-glms"
+	arquivo = open(file, 'r')
+	conteudo = arquivo.readlines()
+	arquivo.close()
+
+	proteina = dict()
+
+	for line in conteudo:
+		if line.startswith(">"):
+			chave = str(line[1:7])
+		else:
+			if line.endswith("\n"):
+				line = line[:-1]
+			try:
+				proteina[chave]
+			except KeyError as e:
+				proteina[chave] = line
+			else:
+				proteina[chave]+= line
+
+	lista_de_dict_proteinas = list()
+
+	for par in zip(proteina.keys(), proteina.values()):
+		chave, valor = par[0], par[1]
+		dic = {chave:valor}
+		lista_de_dict_proteinas.append(dic)
+
+	return lista_de_dict_proteinas
+	
 class Aminoacido:
 
 	def __init__(self, ordem, sigla):
@@ -207,15 +226,18 @@ class AnalisadorProteinas:
 def main():
 
 	aminoacidos_molde = abrir_proteina(sequencia_teorica())
-
 	proteina_molde = Proteina("Original", aminoacidos_molde)
-	proteinas_homologas = abrir_proteinas_homologas()
+	
+	#proteinas_homologas = abrir_proteinas_homologas(sequencias_analisadas())
+	proteinas_homologas = abrir_proteinas_homologas(obter_proteinas_homologas_from_file())
 
 	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
 	retorno = analisador.deixar_somente_proteinas_necessarias()
 
 	for protein in  retorno:
 		print(protein)
+
+	print(len(retorno))
 
 if __name__ == '__main__':
 	main()
