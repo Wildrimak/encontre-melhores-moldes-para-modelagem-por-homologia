@@ -1,10 +1,40 @@
 # -*- coding: utf-8 -*-
+import os
+
+def directory_protein_target():
+
+	current_directory = os.getcwd()
+	files = os.listdir(current_directory)
+	files.sort()
+	protein_directory = files[2]
+		
+	target_directory = os.path.join(current_directory, protein_directory)
+	protein_file = os.listdir(target_directory)[0]
+
+	target = os.path.join(target_directory, protein_file)
+
+	return target
+
+def directory_protein_moldes():
+
+	current_directory = os.getcwd()
+	files = os.listdir(current_directory)
+	files.sort()
+	sequences_directory = files[3]
+	
+	moldes_directory = os.path.join(current_directory, sequences_directory)
+	moldes_file = os.listdir(moldes_directory)[0]
+
+	moldes = os.path.join(moldes_directory, moldes_file)
+
+	return moldes
+
 def sequencia_teorica(which=0):
 	
 	teorica = {"GlmS":"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
 	simples = {"GlmS": "abcdefghij"}
 
-	file = "/home/wildrimak/projects/Aperfeiçoar-e-colocar-no-github/EncontreMelhoresMoldesParaModelagemPorHomologia/sequencias/glms"
+	file = directory_protein_target()
 	arquivo = open(file, 'r')
 	conteudo = arquivo.readlines()
 	arquivo.close()
@@ -68,7 +98,7 @@ def abrir_proteinas_homologas(sequencias):
 	return proteinas
 
 def obter_proteinas_homologas_from_file():
-	file = "/home/wildrimak/projects/Aperfeiçoar-e-colocar-no-github/EncontreMelhoresMoldesParaModelagemPorHomologia/sequencias/blast-glms"
+	file = directory_protein_moldes()
 	arquivo = open(file, 'r')
 	conteudo = arquivo.readlines()
 	arquivo.close()
@@ -366,10 +396,6 @@ class AnalisadorProteinas:
 		nomes.sort()
 		print("Uteis: " + str(nomes))
 
-		return proteinas
-
-	def details(self, proteinas):
-
 		for proteina in proteinas:
 			result = proteina.compare(self.PROTEINA_MOLDE)
 
@@ -388,8 +414,7 @@ def main():
 	proteina_molde = Proteina("Original", aminoacidos_molde)
 	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
 	
-	proteinas = analisador.summary()
-	analisador.details(proteinas)
+	analisador.summary()
 
 if __name__ == '__main__':
 	main()
