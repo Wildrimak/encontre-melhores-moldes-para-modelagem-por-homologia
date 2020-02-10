@@ -62,7 +62,7 @@ def sequencias_analisadas(which=0):
 
 	simples = [
 		{"7ABQ_A":"abzsssshsj"},
-		{"8SOQ_A":"sssdefshsj"},
+		{"8SOQ_A":"abcdefghsj"},
 		{"9PVX_A":"sssssfghij"}
 	]
 
@@ -135,6 +135,9 @@ class Aminoacido:
 
 	def __str__(self):
 		return str(self.ordem) + "" + self.sigla
+
+	def __eq__(self, obj):
+		return isinstance(obj, Aminoacido) and obj.ordem == self.ordem and obj.sigla == self.sigla
 
 class Proteina:
 	def __init__(self, sigla, aminoacidos):
@@ -232,8 +235,11 @@ class Proteina:
 			my_amino, other_amino = par[0], par[1]
 
 
+			print(my_amino)
+			print(other_amino)
 
 			if my_amino == other_amino:
+				print("Entramos")
 				lista_de_centro.append(str(count) + "=")
 			else:
 				lista_de_centro.append(str(count) + "!")
@@ -379,14 +385,27 @@ class AnalisadorProteinas:
 		
 		return Proteina("Resultante", lista_aminoacidos_resultantes)
 
-	def summary(self):
+	def write(self):
+
+		current_directory = os.getcwd()
+		files = os.listdir(current_directory)
+		files.sort()
+		results_directory = files[4]
+		target_directory = os.path.join(current_directory, results_directory)
+		
+
+		final_file = os.path.join(target_directory, "log-resultados")
+
+
+		arquivo_resultado = open(final_file, 'w')
+
 		proteinas = self.deixar_somente_proteinas_necessarias()
-		print("Qtd de proteinas que entraram: " + str(len(self.copia_proteinas_homologas)))
-		print("Qtd de proteinas necessarias: " + str(len(proteinas)))
-		print("As sequencias ficam igual a original? " + str(self.is_equals))
-		print("Qtd de aminoacidos da proteina de entrada: " + str(self.proteina_de_entrada.tamanho))
-		print("Score obtido: " + str(self.PROTEINA_MOLDE.score))
-		print("Percentual em relação ao melhor que se pode obter: " + str(self.PROTEINA_MOLDE.percentual))
+		arquivo_resultado.write("Qtd de proteinas que entraram: " + str(len(self.copia_proteinas_homologas)) + "\n")
+		arquivo_resultado.write("Qtd de proteinas necessarias: " + str(len(proteinas)) + "\n")
+		arquivo_resultado.write("As sequencias ficam igual a original? " + str(self.is_equals) + "\n")
+		arquivo_resultado.write("Qtd de aminoacidos da proteina de entrada: " + str(self.proteina_de_entrada.tamanho) + "\n")
+		arquivo_resultado.write("Score obtido: " + str(self.PROTEINA_MOLDE.score) + "\n")
+		arquivo_resultado.write("Percentual em relação ao melhor que se pode obter: " + str(self.PROTEINA_MOLDE.percentual) + "\n")
 
 
 		nomes = list()
@@ -394,15 +413,17 @@ class AnalisadorProteinas:
 			nomes.append(proteina.sigla)
 
 		nomes.sort()
-		print("Uteis: " + str(nomes))
+		arquivo_resultado.write("Uteis: " + str(nomes) + "\n\n")
 
 		for proteina in proteinas:
 			result = proteina.compare(self.PROTEINA_MOLDE)
 
-			print(result["representation"])
-			print(result["percentual_de_similaridade"])
-			print(result["qtd_aminoacidos_iguais"])
+			arquivo_resultado.write(str(result["representation"]) + "\n\n")
+			arquivo_resultado.write("Percentual de similaridade: " + str(result["percentual_de_similaridade"]) + "\n")
+			arquivo_resultado.write("Qtd de aminoacidos iguais: " + str(result["qtd_aminoacidos_iguais"]) + "\n\n")
 
+
+		arquivo_resultado.close()
 
 def main():
 
@@ -414,7 +435,9 @@ def main():
 	proteina_molde = Proteina("Original", aminoacidos_molde)
 	analisador = AnalisadorProteinas(proteina_molde, proteinas_homologas)
 	
-	analisador.summary()
+	analisador.write()
+
+
 
 if __name__ == '__main__':
 	main()
